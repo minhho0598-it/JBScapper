@@ -1,1 +1,1 @@
-# JBScapper
+# JB Scrapper Application
