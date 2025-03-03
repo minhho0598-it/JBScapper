@@ -1,12 +1,11 @@
-import os
 import json
 import time
+import configparser
+import os
 
-from dotenv import load_dotenv
+from pathlib import Path
 from utils.cookies import Cookies
 from utils.request import GraphQLClient
-
-load_dotenv()
 
 class Scraper:
     """
@@ -29,9 +28,17 @@ class Scraper:
         self.response = None
         self.cookiesFactory = Cookies()
 
+        # Loading config setting
+        config = configparser.ConfigParser()
+        # Use pathlib:
+        config_file_path = Path(__file__).parent.parent / 'config' / 'appsettings.ini'
+        config.read(config_file_path)
+        
+        self.upwork_url = config['API']['UPWORK_URL']
+        self.upwork_api_key = config['API']['UPWORK_API_KEY']
+
 
     def upwork_scraper(self):
-        url = os.getenv('UPWORK_URL')
         cookies = self.cookiesFactory.load_cookies_from_file('assets/cookies/upwork.json')
 
         with open('assets/query/upwork', 'r') as file:
@@ -39,13 +46,12 @@ class Scraper:
         with open('assets/headers/upwork.json', 'r') as file:
             headers = json.load(file)
 
-        API_KEY = os.getenv('UPWORK_API_KEY')
-        if API_KEY:
-            headers['authorization'] = f'bearer {API_KEY}'
+        if self.upwork_api_key:
+            headers['authorization'] = f'bearer {self.upwork_api_key}'
         else:
             raise ValueError('API_KEY environment variable is required')
 
-        client = GraphQLClient(url, cookies, headers)
+        client = GraphQLClient(self.upwork_url, cookies, headers)
         try:
             current_timestamp = int(time.time() * 1000)
             data, status_code = client.execute_query(query, variables={'limit': 10, 'toTime': current_timestamp})
