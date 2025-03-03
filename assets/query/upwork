@@ -1,0 +1,49 @@
+query($limit: Int, $toTime: String) {
+    mostRecentJobsFeed(limit: $limit, toTime: $toTime) {
+        results {
+            id,
+            uid:id
+            title,
+            description,
+            duration,
+            engagement,
+            amount {
+                amount,
+            },
+            createdOn:createdDateTime,
+            publishedOn:publishedDateTime,
+            connectPrice,
+            client {
+                totalHires
+                totalSpent
+                paymentVerificationStatus,
+                location {
+                    country,
+                },
+                totalReviews
+                totalFeedback,
+                hasFinancialPrivacy
+            },
+            tierText
+            tier
+            tierLabel
+            proposalsTier
+            attrs:skills {
+                id,
+                prettyName:prefLabel
+            }
+            hourlyBudget {
+                type
+                min
+                max
+            }
+            isApplied
+        },
+        paging {
+            total,
+            count,
+            resultSetTs:minTime,
+            maxTime
+        }
+    }
+}
