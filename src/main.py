@@ -1,5 +1,5 @@
-from core.scrapper import Scraper
-from core.database import DatabaseManager
+from src.business.scrapper import Scraper
+from src.data_access.database import DatabaseManager
 
 def main():
     try:
