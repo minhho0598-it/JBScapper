@@ -1,9 +1,8 @@
 import json
 import time
 import configparser
-import os
-
 from pathlib import Path
+
 from utils.cookies import Cookies
 from utils.request import GraphQLClient
 
@@ -37,7 +36,6 @@ class Scraper:
         self.upwork_url = config['API']['UPWORK_URL']
         self.upwork_api_key = config['API']['UPWORK_API_KEY']
 
-
     def upwork_scraper(self):
         cookies = self.cookiesFactory.load_cookies_from_file('assets/cookies/upwork.json')
 
@@ -55,10 +53,15 @@ class Scraper:
         try:
             current_timestamp = int(time.time() * 1000)
             data, status_code = client.execute_query(query, variables={'limit': 10, 'toTime': current_timestamp})
+            if 'data' in data and 'bestMatchJobsFeed' in data['data'] and 'results' in data['data']['searchJobs']:
+                jobs = data['data']['bestMatchJobsFeed']['results']
+                return {
+                    'jobs' : jobs,
+                    'status_code': status_code
+                }
             return {
                 'statusCode': status_code,
                 'body': json.dumps(data)
             }
         except Exception as e:
             raise RuntimeError('Cannot load new jobs from Upwork because of: ' + str(e))
-        
